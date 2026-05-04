@@ -9,6 +9,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -33,11 +34,12 @@ export default function LoginPage() {
       return;
     }
 
-    if (!res.ok) {
-        setErrorMessage(data.error ?? "ログインに失敗しました");
-        return;
-      }
-      
+    if (data.role !== "mentor" && data.role !== "student") {
+      setErrorMessage("role が取得できませんでした。プロフィールを確認してください。");
+      setIsSubmitting(false);
+      return;
+    }
+
     router.push(data.role === "mentor" ? "/mentor" : "/student");
     router.refresh();
     setIsSubmitting(false);
@@ -72,16 +74,26 @@ export default function LoginPage() {
             <label htmlFor="password" className="text-sm font-medium text-slate-700">
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-10 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
+              <button
+                type="button"
+                aria-label={showPassword ? "パスワードを隠す" : "パスワードを表示する"}
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-xs font-medium text-slate-500 hover:text-slate-700"
+              >
+                {showPassword ? "隠す" : "表示"}
+              </button>
+            </div>
           </div>
 
           <button
