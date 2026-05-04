@@ -42,13 +42,12 @@ export async function middleware(request: NextRequest) {
 
     const role = profile?.role;
 
-    // studentがmentorに行ったら拒否
-    if (pathname.startsWith("/mentor") && role !== "mentor") {
+    // role が取得できたときだけ、他ロール画面へのアクセスを制限する
+    if (pathname.startsWith("/mentor") && role && role !== "mentor") {
       return NextResponse.redirect(new URL("/student", request.url));
     }
 
-    // mentorがstudentに行ったら拒否
-    if (pathname.startsWith("/student") && role !== "student") {
+    if (pathname.startsWith("/student") && role && role !== "student") {
       return NextResponse.redirect(new URL("/mentor", request.url));
     }
   }
