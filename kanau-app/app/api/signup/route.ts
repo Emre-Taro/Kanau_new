@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+const SESSION_COOKIE_NAME = "kanau_session_expires_at";
+const SESSION_MAX_AGE_SECONDS = 30 * 60;
+
 export async function POST(request: Request) {
   const { email, password, role } = await request.json();
 
@@ -50,5 +53,15 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ user: data.user, role });
+  const response = NextResponse.json({ user: data.user, role });
+
+  response.cookies.set(SESSION_COOKIE_NAME, String(Date.now() + SESSION_MAX_AGE_SECONDS * 1000), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: SESSION_MAX_AGE_SECONDS,
+  });
+
+  return response;
 }
