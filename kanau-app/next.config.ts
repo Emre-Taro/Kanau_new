@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return [
+      {
+        source: "/",           // トップページ（/）にアクセスが来たら
+        destination: "/login", // /login に自動で転送する
+        permanent: false,      // 一時的なリダイレクト（ステータスコード 307）
+      },
+    ];
+  },
 };
 
 export default nextConfig;
